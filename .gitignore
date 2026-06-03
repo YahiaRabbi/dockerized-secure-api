@@ -1,0 +1,10 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Backup files
+db_backup.sql
+*.bak
+
+# Environment variables (If we use them)
+.env

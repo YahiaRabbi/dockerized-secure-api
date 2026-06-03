@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres_db
+      - redis_cache
+      
+  postgres_db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: noorzaah_db
+    ports:
+      - "5432:5432"
+      
+  redis_cache:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
