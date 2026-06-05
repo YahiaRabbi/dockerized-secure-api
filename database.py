@@ -1,17 +1,30 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import redis
-import json
 
-# PostgreSQL Connection
-SQLALCHEMY_DATABASE_URL = "postgresql://admin:adminpassword@postgres_db:5432/noorzaah_db"
+# Load environment variables from .env file
+load_dotenv()
+
+# Build PostgreSQL Connection URL safely
+DB_USER = os.getenv("DB_USER", "admin")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "adminpassword")
+DB_HOST = os.getenv("DB_HOST", "postgres_db")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "noorzaah_db")
+
+SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # Redis Connection
 redis_client = redis.Redis(host='redis_cache', port=6379, db=0, decode_responses=True)
+
+
 
 # User Model for PostgreSQL
 class User(Base):
@@ -21,8 +34,21 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
+
+
+# NEW: Product Model for PostgreSQL
+class Product(Base):
+    __tablename__ = "products"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    price_bdt = Column(Integer)
+
+
+
 # Create tables in DB
 Base.metadata.create_all(bind=engine)
+
+
 
 # Dependency to get DB session
 def get_db():
